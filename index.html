@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lucky Draw Wheel</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Admin 页面打开按钮 -->
+	<button class="admin-toggle-btn" onclick="openAdminWindow()">🔧 Admin Panel</button>
+
+
+
+  <!-- Page Header（页面标题） -->
+  <header class="main-header">
+    <h1>Lucky Wheel Draw</h1>
+  </header>
+
+  <!-- Main layout（主布局） -->
+  <div class="main-flex">
+
+    <!-- Winner box（历史中奖者名单） -->
+    <div class="winner-container">
+      <div id="winner-list">
+        <h3 style="margin-top: 0; color: #004466;">🎉 Winner List</h3>
+        <ul></ul> <!-- JS 会填入 <li> -->
+      </div>
+    </div>
+
+	<!-- Wheel only -->
+	<div class="container wheel-container">
+	  <canvas id="wheelcanvas"></canvas>
+	</div>
+
+
+  <!-- Background music（背景音乐播放器） -->
+  <audio id="bgMusic" loop>
+    <source src="music/background.mp3" type="audio/mpeg" />
+    Your browser does not support the audio element.
+  </audio>
+
+
+  <!-- 🎯 自定义中奖弹窗 | Custom Winner Popup -->
+  <div id="customPopup" class="popup hidden">
+    <div class="popup-content">
+      <h2>🎯 Winner!</h2>
+      <p id="winnerNameDisplay"></p>
+      <button onclick="closePopup()">OK</button>
+    </div>
+  </div>
+
+  <canvas id="confettiCanvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;pointer-events:none;z-index:10000;"></canvas>
+
+  <!-- 基础控制脚本 -->
+  <script>
+    function toggleMusic() {
+      const bgMusic = document.getElementById("bgMusic");
+      if (bgMusic.paused) {
+        bgMusic.play();
+      } else {
+        bgMusic.pause();
+      }
+    }
+  </script>
+
+  <!-- Confetti Library -->
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+
+  <!-- 你的主脚本 -->
+  <script src="script.js"></script>
+  
+  <script>
+  let adminWindow = null;
+
+  function openAdminWindow() {
+    if (adminWindow && !adminWindow.closed) {
+      adminWindow.focus(); // 如果已打开，聚焦窗口
+    } else {
+      adminWindow = window.open(
+        'admin.html',
+        'AdminPanel',
+        'width=500,height=700,left=100,top=100,toolbar=no,menubar=no,resizable=no'
+      );
+    }
+  }
+</script>
+
+</body>
+</html>

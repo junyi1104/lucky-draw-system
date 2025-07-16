@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lucky Draw Admin Panel</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #f4f4f4;
+      max-width: 600px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    h2, h3 { margin-top: 30px; }
+    label, input, button {
+      display: block;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 8px;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      background-color: #007bff;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .btn-danger { background-color: #dc3545; }
+    .btn-secondary { background-color: #6c757d; }
+    .btn-danger:hover { background-color: #c82333; }
+
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      background: #28a745;
+      border-radius: 3px;
+      appearance: none;
+      outline: none;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none;
+      width: 14px;
+      height: 14px;
+      background: white;
+      border: 2px solid #28a745;
+      border-radius: 50%;
+      cursor: pointer;
+    }
+
+    ul { padding-left: 20px; }
+  </style>
+</head>
+<body>
+  <h2>🎛️ Lucky Draw Admin Panel</h2>
+
+  <!-- 👤 名单管理 -->
+  <label>插入名字</label>
+  <input id="nameInput" placeholder="输入名字" onkeydown="if (event.key === 'Enter') sendInsertName()" />
+  <button onclick="sendInsertName()">插入</button>
+  <div id="duplicateWarning" style="color:red;font-weight:bold;"></div>
+
+  <button class="btn-danger" onclick="sendRemoveAllNames()">清空所有名字</button>
+
+  <label>上传名单 (.txt)</label>
+  <input type="file" id="nameListUpload" accept=".txt" onchange="handleNameFile()" />
+
+  <button onclick="sendExportNames()">导出名单</button>
+  <button class="btn-danger" onclick="sendClearWinners()">清空中奖者</button>
+
+  <!-- 🖊️ 外观设置 -->
+  <h3>🎨 外观设置</h3>
+  <label>标题</label>
+  <input id="titleInput" placeholder="输入标题" />
+  <button onclick="sendSetTitle()">更新标题</button>
+
+  <label>标题颜色</label>
+  <input type="color" id="titleColorInput" onchange="sendTitleColor()" />
+
+  <label>Winner 字体颜色</label>
+  <input type="color" id="winnerColorInput" onchange="sendWinnerColor()" />
+
+  <label>背景音乐音量</label>
+  <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1" onchange="sendVolume()" />
+
+  <label>上传背景图</label>
+  <input type="file" id="bgUpload" accept="image/*" onchange="handleBgUpload()" />
+
+  <!-- 🔊 音效控制 -->
+  <h3>🔊 音效设置</h3>
+  <div>
+    <label><input type="checkbox" id="clickSoundToggle"> 启用点击音效</label>
+    <input type="range" id="clickSoundVolume" min="0" max="1" step="0.01" />
+    <button onclick="testSound('click')">测试点击音效</button>
+  </div>
+
+  <div>
+    <label><input type="checkbox" id="spinSoundToggle"> 启用旋转音效</label>
+    <input type="range" id="spinSoundVolume" min="0" max="1" step="0.01" />
+    <button onclick="testSound('spin')">测试旋转音效</button>
+  </div>
+
+  <div>
+    <label><input type="checkbox" id="winSoundToggle"> 启用中奖音效</label>
+    <input type="range" id="winSoundVolume" min="0" max="1" step="0.01" />
+    <button onclick="testSound('win')">测试中奖音效</button>
+  </div>
+
+  <button onclick="saveSoundSettings()">💾 保存音效设置</button>
+
+  <!-- 📋 当前名单 -->
+  <h3>👥 当前名单</h3>
+  <ul id="userListDisplay"><li><em>暂无数据</em></li></ul>
+  <button onclick="requestUserList()">🔄 刷新名单</button>
+  <button onclick="openNameListWindow()">👀 查看当前名单</button>
+
+  <!-- ⚙️ 控制功能 -->
+  <h3>⚙️ 控制面板</h3>
+  <button onclick="sendSpin()">🎯 开始抽奖</button>
+  <button class="btn-secondary" onclick="toggleAutoSpin()">🔄 自动旋转 On/Off</button>
+  <button class="btn-secondary" onclick="toggleMusicRemote()">🔊 播放/暂停音乐</button>
+
+  <!-- 📜 脚本 -->
+  <script>
+    let autoSpinEnabled = true;
+    let nameListWindow = null;
+
+    const $ = id => document.getElementById(id);
+    const sendMessage = (type, payload) => window.opener?.postMessage({ type, payload }, "*");
+
+    function sendInsertName() {
+      const name = $("nameInput").value.trim();
+      if (name) {
+        sendMessage("insertName", name);
+        $("nameInput").value = "";
+      }
+    }
+
+    function sendRemoveAllNames() {
+      if (confirm("确认清除所有名字？")) sendMessage("removeAllNames");
+    }
+
+    function handleNameFile() {
+      const file = $("nameListUpload").files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        const lines = e.target.result.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+        sendMessage("uploadNameList", lines);
+      };
+      reader.readAsText(file);
+    }
+
+    function sendExportNames() { sendMessage("requestNameExport"); }
+    function sendClearWinners() { if (confirm("确认清除中奖者？")) sendMessage("clearWinners"); }
+    function sendSetTitle() { const t = $("titleInput").value.trim(); if (t) sendMessage("setTitle", t); }
+    function sendTitleColor() { sendMessage("setTitleColor", $("titleColorInput").value); }
+    function sendWinnerColor() { sendMessage("setWinnerColor", $("winnerColorInput").value); }
+    function sendVolume() { sendMessage("setVolume", parseFloat($("volumeSlider").value)); }
+    function sendSpin() { sendMessage("spinNow"); }
+    function toggleAutoSpin() { autoSpinEnabled = !autoSpinEnabled; sendMessage(autoSpinEnabled ? "startAutoSpin" : "stopAutoSpin"); }
+    function toggleMusicRemote() { sendMessage("toggleMusic"); }
+
+    function handleBgUpload() {
+      const file = $("bgUpload").files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => sendMessage("setBackground", e.target.result);
+      reader.readAsDataURL(file);
+    }
+
+    function saveSoundSettings() {
+      const clickEnabled = $("clickSoundToggle").checked;
+      const spinEnabled = $("spinSoundToggle").checked;
+      const winEnabled = $("winSoundToggle").checked;
+      const clickVol = $("clickSoundVolume").value;
+      const spinVol = $("spinSoundVolume").value;
+      const winVol = $("winSoundVolume").value;
+
+      localStorage.setItem("clickSoundEnabled", clickEnabled);
+      localStorage.setItem("spinSoundEnabled", spinEnabled);
+      localStorage.setItem("winSoundEnabled", winEnabled);
+      localStorage.setItem("clickSoundVolume", clickVol);
+      localStorage.setItem("spinSoundVolume", spinVol);
+      localStorage.setItem("winSoundVolume", winVol);
+
+      sendMessage("updateSoundSettings", {
+        clickEnabled, spinEnabled, winEnabled,
+        clickVol: parseFloat(clickVol),
+        spinVol: parseFloat(spinVol),
+        winVol: parseFloat(winVol)
+      });
+    }
+
+    function testSound(type) {
+      const enabled = $(type + "SoundToggle").checked;
+      const volume = parseFloat($(type + "SoundVolume").value);
+      if (!enabled) return alert("请先启用此音效！");
+      const sound = new Audio(`sound/${type}.mp3`);
+      sound.volume = volume;
+      sound.play();
+    }
+
+    function openNameListWindow() {
+      if (nameListWindow && !nameListWindow.closed) {
+        nameListWindow.focus();
+        sendMessage("getUserList");
+      } else {
+        nameListWindow = window.open("", "NameListWindow", "width=400,height=500,left=200,top=150");
+        nameListWindow.document.write(`
+          <!DOCTYPE html><html><head><title>当前名单</title>
+          <style>body{font-family:sans-serif;padding:20px} ul{padding:0;list-style:none} li{padding:6px;border-bottom:1px solid #ccc}</style>
+          </head><body><h2>👥 当前名单</h2><ul id="listContainer"><li>正在加载中...</li></ul></body></html>
+        `);
+        sendMessage("getUserList");
+      }
+    }
+
+    function requestUserList() { sendMessage("getUserList"); }
+
+    function loadSoundSettings() {
+      $("clickSoundToggle").checked = localStorage.getItem("clickSoundEnabled") !== "false";
+      $("spinSoundToggle").checked = localStorage.getItem("spinSoundEnabled") !== "false";
+      $("winSoundToggle").checked = localStorage.getItem("winSoundEnabled") !== "false";
+      $("clickSoundVolume").value = localStorage.getItem("clickSoundVolume") || 0.5;
+      $("spinSoundVolume").value = localStorage.getItem("spinSoundVolume") || 0.5;
+      $("winSoundVolume").value = localStorage.getItem("winSoundVolume") || 0.5;
+    }
+
+    window.addEventListener("DOMContentLoaded", loadSoundSettings);
+
+    // 处理主页面发回的数据
+    window.addEventListener("message", event => {
+      const { type, payload } = event.data;
+
+      if (type === "nameDuplicate") {
+        $("duplicateWarning").textContent = `⚠️ 名字 "${payload}" 已存在！`;
+        setTimeout(() => $("duplicateWarning").textContent = "", 3000);
+      }
+
+      if (type === "userList" && Array.isArray(payload)) {
+        const win = nameListWindow;
+        if (!win || win.closed) return;
+        const ul = win.document.getElementById("listContainer");
+        ul.innerHTML = payload.length
+          ? payload.map((n, i) => `<li>${i + 1}. ${n}</li>`).join("")
+          : "<li><em>暂无用户</em></li>";
+      }
+    });
+  </script>
+</body>
+</html>

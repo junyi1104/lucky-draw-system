@@ -1,0 +1,452 @@
+/* =====================
+   Global Styles 全局样式
+   ===================== */
+
+body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: transparent;
+    z-index: -1;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: transparent; /* 背景透明，方便放背景图 */
+    background-size: cover;             /* 图片填满屏幕 */
+    background-position: center center; /* 水平垂直居中 */
+    background-repeat: no-repeat;       /* 不重复 */
+    background-attachment: fixed;       /* 滚动时背景固定 */
+    min-height: 100vh;                  /* 最小高度占满屏幕 */
+    background-color: #000;             /* 作为加载失败时的底色 */
+}
+
+/* =====================
+   Container 容器样式
+   ===================== */
+.container {
+  margin: 50px auto;
+  width: 1800px;
+  background: transparent;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+canvas {
+  background: transparent !important; /* 确保 canvas 背景透明 */
+}
+
+input {
+  padding: 10px;
+  width: 60%;
+  margin-right: 10px;
+}
+
+/* =====================
+   Buttons 按钮样式
+   ===================== */
+button, .export-btn {
+  padding: 10px 20px;
+  background: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+button:hover, .export-btn:hover {
+  background: #218838;
+}
+
+/* =====================
+   Animation 动画
+   ===================== */
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(3600deg); /* 10 圈旋转 */
+  }
+}
+
+.wheel.spin {
+  animation: spin 4s cubic-bezier(0.33, 1, 0.68, 1) forwards;
+}
+
+/* =====================
+   Flex Layout 布局
+   ===================== */
+.wheel-user-flex, .main-flex {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 30px;
+}
+
+.main-flex {
+  gap: 40px;
+}
+
+.wheel-container {
+  width: 1000px;
+  min-width: 1000px;
+  background: transparent;
+}
+
+.userlist-container {
+  width: 350px;
+  min-width: 260px;
+  background: transparent;
+  box-shadow: none;
+  padding-top: 60px;
+}
+
+/* =====================
+   User List 用户列表
+   ===================== */
+.user-list-box {
+  min-width: 220px;
+  max-width: 350px;
+  max-height: 500px;
+  margin: 40px auto 0 auto;
+  overflow-y: auto;
+  background: rgba(255,255,255,0.85); /* 半透明白色背景 */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 18px;
+  text-align: left;
+  font-size: 16px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.08);
+  display: block; /* 确保在 adminPanel 中显示 */
+  color: #000; /* ✅ 设为黑色字体 */
+}
+
+
+.user-list-box ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.user-list-box li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2px 0;
+  border-bottom: 1px solid #28a745; /* 绿色分隔线 */
+  color: #000; /* ✅ 保证 li 内文字为黑色 */
+}
+
+.user-list-box li:last-child {
+  border-bottom: none;
+}
+
+.user-list-box button {
+  background: #dc3545; /* 红色移除按钮 */
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  margin-left: 8px;
+  padding: 2px 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.user-list-box button:hover {
+  background: #b52a37;
+}
+
+/* “No users” 提示文字 */
+.user-list-box .no-users {
+  color: red;
+  font-weight: bold;
+  text-align: center;
+  padding: 10px 0;
+}
+
+/* =====================
+   Header 标题栏
+   ===================== */
+.main-header {
+  width: 100%;
+  background: transparent;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  padding: 18px 0 10px 0;
+  margin-bottom: 30px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  z-index: 1;
+}
+
+.main-header h1 {
+  margin: 0 0 10px 0;
+  font-size: 2.2em;
+  letter-spacing: 1px;
+  padding: 0 100px;
+  color: #00698f; /* 蓝绿色主题色 */
+  text-align: center;
+}
+
+.header-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-right: 40px;
+}
+
+
+/* =====================
+   Admin Panel 管理面板
+   ===================== */
+.admin-panel {
+  position: fixed;
+  top: 0;
+  right: -400px; /* 默认隐藏 */
+  width: 300px;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.3);/* 更淡更朦胧 */
+  backdrop-filter: blur(10px); /* 朦胧玻璃效果 */
+  -webkit-backdrop-filter: blur(10px); /* Safari 支持 */
+  box-shadow: -4px 0 12px rgba(0, 0, 0, 0.2);
+  border-left: 1px solid rgba(255, 255, 255, 0.3); /* 微弱边界线 */
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: right 0.3s ease;
+  z-index: 999;
+  color: #ffffff; /* 确保文字是白色 */
+}
+
+
+.admin-panel.show {
+  right: 0; /* 滑出显示 */
+}
+
+.admin-toggle-btn {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
+/* =====================
+   Wheel 转盘
+   ===================== */
+#wheelcanvas {
+  width: 100%;
+  max-width: 10000px; /* 可根据需求扩大尺寸 */
+  height: auto;
+  display: block;
+  margin: 0 auto;
+}
+
+/* =====================
+   Winner List 美化后的中奖名单
+   ===================== */
+#winner-list {
+  position: fixed;
+  top: 100px;
+  left: 40px;
+  z-index: 999;
+
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  color: #000;
+  max-height: 250px;
+  max-width: 300px;     /* ✅ 修改宽度 */
+  min-width: 300px;     /* ✅ 一起加 */
+  overflow-y: auto;
+  font-size: 20px; /* ✅ 加大字体 */
+  line-height: 1.4;
+  text-align: left;
+}
+
+
+
+#winner-list ul {
+  list-style: none;      /* 移除点 */
+  padding-left: 0;       /* 可选：取消默认缩进 */
+  margin: 0;
+}
+
+
+#winner-list li {
+  padding: 4px 0;
+  font-size: 18px; /* ✅ 如果要更具体调整每一项 */
+  font-weight: 600; /* 可选：加粗一点 */
+}
+
+#winner-list h3 {
+  margin-top: 0;
+}
+
+#winner-list li:last-child {
+  border-bottom: none;
+}
+
+#winner-list button {
+  margin-top: 10px;
+  background: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+#winner-list button:hover {
+  background: #b52a37;
+}
+
+
+/* Admin 面板内按钮的 hover 效果 */
+.admin-panel button:hover {
+  color: red; /* 悬停时文字变红 */
+}
+
+/* ======= 弹窗外壳 popup ======= */
+.popup {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(0.8);
+  opacity: 0;
+  background: rgba(255, 255, 255, 0.2);  /* 毛玻璃背景 */
+  backdrop-filter: blur(12px);
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  transition: all 0.4s ease;
+  pointer-events: none;
+}
+
+/* 显示时 */
+.popup.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+}
+
+/* 隐藏时 */
+.popup.hidden {
+  display: none !important;
+}
+
+
+/* ======= 弹窗内容 popup-content ======= */
+.popup-content {
+  background: white;
+  padding: 30px 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  text-align: center;
+  animation: popIn 0.5s ease forwards;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+
+/* 标题样式 */
+.popup-content h2 {
+  color: #d63384;
+  font-size: 2em;
+}
+
+/* 中奖人名字 */
+.popup-content p {
+  font-size: 1.6em;
+  font-weight: bold;
+  color: #333;
+  margin: 16px 0;
+}
+
+
+/* 按钮样式 */
+.popup-content button {
+  margin-top: 20px;
+  padding: 10px 24px;
+  background: #28a745;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.popup-content button:hover {
+  background: #218838;
+}
+
+@media (max-width: 768px) {
+  .main-flex {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .container, .wheel-container {
+    width: 95% !important;
+    min-width: auto;
+  }
+
+  .admin-panel {
+    width: 100%;
+    right: -100%;
+  }
+
+  .admin-panel.show {
+    right: 0;
+  }
+
+  #winner-list {
+    left: 10px;
+    top: 80px;
+    max-width: 90vw;
+  }
+}
+
+.sound-settings {
+  background: rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 16px;
+  backdrop-filter: blur(8px);
+}
+
+.sound-settings h3 {
+  margin-top: 0;
+  color: #fff;
+}
+
+.sound-settings label {
+  font-weight: bold;
+  color: #fff;
+}
+
+.sound-settings input[type="range"] {
+  width: 100%;
+}
+
+
